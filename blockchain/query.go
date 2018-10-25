@@ -21,3 +21,20 @@ func (setup *FabricSetup) QueryHello() (string, error) {
 
 	return string(response.Payload), nil
 }
+
+
+func (setup *FabricSetup) QueryKeyGet(key string) (string, error) {
+
+	// Prepare arguments
+	var args []string
+	args = append(args, "invoke")
+	args = append(args, "query")
+	args = append(args, key)
+
+	response, err := setup.client.Query(channel.Request{ChaincodeID: setup.ChainCodeID, Fcn: args[0], Args: [][]byte{[]byte(args[1]), []byte(args[2])}})
+	if err != nil {
+		return "", fmt.Errorf("failed to query: %v", err)
+	}
+
+	return string(response.Payload), nil
+}

@@ -14,7 +14,7 @@ type HeroesServiceChaincode struct {
 // This function is called only one when the chaincode is instantiated.
 // So the goal is to prepare the ledger to handle future requests.
 func (t *HeroesServiceChaincode) Init(stub shim.ChaincodeStubInterface) pb.Response {
-	fmt.Println("########### HeroesServiceChaincode Init ###########")
+	fmt.Println("########### Chaincode Init ###########")
 
 	// Get the function and arguments from the request
 	function, _ := stub.GetFunctionAndParameters()
@@ -37,7 +37,7 @@ func (t *HeroesServiceChaincode) Init(stub shim.ChaincodeStubInterface) pb.Respo
 // Invoke
 // All future requests named invoke will arrive here.
 func (t *HeroesServiceChaincode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
-	fmt.Println("########### HeroesServiceChaincode Invoke ###########")
+	fmt.Println("########### Chaincode Invoke ###########")
 
 	// Get the function and arguments from the request
 	function, args := stub.GetFunctionAndParameters()
@@ -70,47 +70,40 @@ func (t *HeroesServiceChaincode) Invoke(stub shim.ChaincodeStubInterface) pb.Res
 // query
 // Every readonly functions in the ledger will be here
 func (t *HeroesServiceChaincode) query(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-	fmt.Println("########### HeroesServiceChaincode query ###########")
+	fmt.Println("########### Chaincode query ###########")
 
 	// Check whether the number of arguments is sufficient
 	if len(args) < 2 {
 		return shim.Error("The number of arguments is insufficient.")
 	}
 
-	// Like the Invoke function, we manage multiple type of query requests with the second argument.
-	// We also have only one possible argument: hello
-	if args[1] == "hello" {
-
-		// Get the state of the value matching the key hello in the ledger
-		state, err := stub.GetState("hello")
-		if err != nil {
-			return shim.Error("Failed to get state of hello")
-		}
-
-		// Return this value in response
-		return shim.Success(state)
+	// Get the state of the value matching the key hello in the ledger
+	state, err := stub.GetState(args[1])
+	if err != nil {
+		return shim.Error("Failed to get state of key:" + args[1])
 	}
 
-	// If the arguments given don’t match any function, we return an error
-	return shim.Error("Unknown query action, check the second argument.")
+	// Return this value in response
+	return shim.Success(state)
+
 }
 
 // invoke
 // Every functions that read and write in the ledger will be here
 func (t *HeroesServiceChaincode) invoke(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-	fmt.Println("########### HeroesServiceChaincode invoke ###########")
+	fmt.Println("########### Chaincode invoke processing ###########")
 
 	if len(args) < 2 {
 		return shim.Error("The number of arguments is insufficient.")
 	}
 
 	// Check if the ledger key is "hello" and process if it is the case. Otherwise it returns an error.
-	if args[1] == "hello" && len(args) == 3 {
+	if len(args) == 3 {
 
 		// Write the new value in the ledger
-		err := stub.PutState("hello", []byte(args[2]))
+		err := stub.PutState(args[1], []byte(args[2]))
 		if err != nil {
-			return shim.Error("Failed to update state of hello")
+			return shim.Error("Failed to put state of key:" + args[1] + " value:" + args[2])
 		}
 
 		// Notify listeners that an event "eventInvoke" have been executed (check line 19 in the file invoke.go)
@@ -131,6 +124,6 @@ func main() {
 	// Start the chaincode and make it ready for futures requests
 	err := shim.Start(new(HeroesServiceChaincode))
 	if err != nil {
-		fmt.Printf("Error starting Heroes Service chaincode: %s", err)
+		fmt.Printf("Error starting Service chaincode: %s", err)
 	}
 }
