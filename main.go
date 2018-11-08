@@ -1,16 +1,43 @@
 package main
 
 import (
-	"bufio"
+	//"bufio"
 	"fmt"
 	"github.com/chainHero/heroes-service/blockchain"
 	"io"
-	"log"
 	"os"
+	//"log"
+	"os/exec"
 	"strconv"
-	"syscall"
+	//"syscall"
 	"time"
 )
+
+func targetScan() ([]byte, error) {
+	time.After(time.Second * 5)
+	fmt.Printf("+++ Reading info for publishing +++\n")
+	//cmd := exec.Command("aide", "-c ./aide.conf --check")
+	cmd := exec.Command("/bin/sh", "-c", "sudo aide -c ./aide.conf --check")
+	stdin, err := cmd.StdinPipe()
+	if err != nil {
+		//log.Fatal(err)
+		return nil, err
+	}
+
+	go func() {
+		defer stdin.Close()
+		//io.WriteString(stdin, "values written to stdin are passed to cmd's standard input")
+	}()
+
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		//log.Fatal(err)
+		return out, err
+	}
+
+	//fmt.Printf("%s\n", out)
+	return out, err
+}
 
 func main() {
 	var err error
@@ -62,8 +89,9 @@ func main() {
 
 	////////////////////////////////
 
-	var pipeFile = "pipLogs"
-	//var file *os.File
+	/*
+	//var pipeFile = "pipLogs"
+	var file *os.File
 	os.Remove(pipeFile)
 	e := syscall.Mkfifo(pipeFile, 0666)
 	if e != nil {
@@ -77,6 +105,7 @@ func main() {
 	}
 
 	reader := bufio.NewReader(file)
+	*/
 	var line []byte
 
 	/*
@@ -92,30 +121,33 @@ func main() {
 	*/
 
 	for {
-		line, err = reader.ReadBytes('\n')
+		//line, err = reader.ReadBytes('\n')
+		line, err = targetScan()
+		//fmt.Printf("+++ Got info:%s +++\n")
 		if err == nil {
 			key := strconv.FormatInt(time.Now().Unix(), 10)
 			//key := "hello"
-			fmt.Printf("\n\n### Pushing key:%s log:%s ", key, string(line))
+			//fmt.Printf("\n\n### Pushing key:%s log:%s ", key, string(line))
 			_, err = fSetup.InvokeKeySet(key, string(line))
 			if err != nil {
 				fmt.Printf("--- Published key:%s log:%s fail! ---\n", key, string(line))
 				continue
 			} else {
-				fmt.Printf("+++ Published key:%s log:%s success! ---\n", key, string(line))
+				//fmt.Printf("+++ Published key:%s log:%s success! +++\n", key, string(line))
+				fmt.Printf("+++ Published key:%s success! +++\n", key)
 			}
-			fmt.Printf("=== Querying privious log with key:%s \n", key)
+			//fmt.Printf("=== Querying privious log with key:%s \n", key)
 			var v string
 			v, err = fSetup.QueryKeyGet(key)
 			if err != nil {
 				fmt.Printf("--- Queried with key:%s fail! ---\n", key)
 			} else {
-				fmt.Printf("+++ Queried with key:%s get log:%s success! ---\n", key, v)
+				fmt.Printf("+++ Queried with key:%s get log:%s success! +++\n", key, v)
 			}
 		} else if err == io.EOF {
 			time.Sleep(time.Millisecond * 100)
 		} else {
-			fmt.Printf("------------------------------\n")
+			fmt.Printf("--- Err:%+v line:%s ---------------------------\n", err, line)
 		}
 	}
 }
