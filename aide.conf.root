@@ -1,0 +1,41 @@
+
+database=file:/usr/local/aide/aide.db
+database_out=file:/usr/local/aide/aide.db.new
+
+SECCRoot = p+i+u+g+s+b+md5+sha1
+SECCRule = p+i+n+u+g+s+b+m+c+md5+sha1
+
+/   SECCRoot
+
+/bin    SECCRule
+/boot    SECCRule
+/etc    SECCRule
+/initrd.img    SECCRule
+/lib    SECCRule
+/lib64    SECCRule
+/vmlinuz    SECCRule
+
+#/bin/
+#/boot/
+!/cdrom/
+!/dev/
+#/etc/
+!/home/
+#/initrd.img -> boot/initrd.img-4.10.0-38-generic
+#/lib/
+#/lib64/
+!/lost+found/
+!/media/
+!/mnt/
+!/opt/
+!/proc/
+!/run/
+!/sbin/
+!/srv/
+!/sys/
+!/tmp/
+!/usr/
+!/var/
+#/vmlinuz -> boot/vmlinuz-4.10.0-38-generic
+
+
