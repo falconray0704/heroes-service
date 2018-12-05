@@ -155,9 +155,9 @@ func main() {
 			} else {
 				//fmt.Printf("+++ Queried with key:%s get log:%s success! +++\n", key, v)
 				if string(line) == v {
-					fmt.Printf("+++ Queried with key:%s success! +++\n", key)
+					fmt.Printf("+++ Queried with key:%s success! %s +++\n", key, v)
 				} else {
-					fmt.Printf("--- Queried with key:%s success, but data incorrect! ---\n", key)
+					fmt.Printf("--- Queried with key:%s success, %s but data incorrect! ---\n", key, v)
 				}
 			}
 		} else if err == io.EOF {
