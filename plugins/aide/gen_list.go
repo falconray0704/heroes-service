@@ -309,59 +309,59 @@ func (tree *Seltree) Print_tree_rx(prefix string) {
 	var newSet = true
 	var inPrefix = ""
 
-	fmt.Printf("%s node: %s\n", prefix, tree.Path)
+	fmt.Printf("%s--%s\n", prefix, tree.Path)
 
 	newSet = true
 	for r = tree.Sel_rx_lst.Front(); r != nil; r = r.Next() {
 		rxc, _ = r.Value.(*Rx_rule)
 		if newSet {
-			inPrefix = "\t" + prefix
+			inPrefix = prefix + "  " + "\t"
 			newSet = false
 		}
-		fmt.Printf("%s Sel_rx: %d %s\n", inPrefix, rxc.Conf_lineno, rxc.Rx)
+		fmt.Printf("%s [Sel_rx: %d %s]\n", inPrefix, rxc.Conf_lineno, rxc.Rx)
 	}
-	fmt.Printf("%s\n", inPrefix)
+	//fmt.Printf("%s\n", inPrefix)
 
 	newSet = true
 	for r = tree.Equ_rx_lst.Front(); r != nil; r = r.Next() {
 		rxc, _ = r.Value.(*Rx_rule)
 		if newSet {
-			inPrefix = "\t" + prefix
+			inPrefix = prefix + "  " + "\t"
 			newSet = false
 		}
-		fmt.Printf("%s Equ_rx: %d %s\n", inPrefix, rxc.Conf_lineno, rxc.Rx)
+		fmt.Printf("%s [Equ_rx: %d %s]\n", inPrefix, rxc.Conf_lineno, rxc.Rx)
 	}
-	fmt.Printf("%s\n", inPrefix)
+	//fmt.Printf("%s\n", inPrefix)
 
 	newSet = true
 	for r = tree.Neg_rx_lst.Front(); r != nil; r = r.Next() {
 		rxc, _ = r.Value.(*Rx_rule)
 		if newSet {
-			inPrefix = "\t" + prefix
+			inPrefix = prefix + "  " + "\t"
 			newSet = false
 		}
-		fmt.Printf("%s Neg_rx: %d %s\n", inPrefix, rxc.Conf_lineno, rxc.Rx)
+		fmt.Printf("%s [Neg_rx: %d %s]\n", inPrefix, rxc.Conf_lineno, rxc.Rx)
 	}
-	fmt.Printf("%s\n", inPrefix)
+	//fmt.Printf("%s\n", inPrefix)
 
 	for r = tree.Childs.Front(); r != nil; r = r.Next() {
 		t, _ := r.Value.(*Seltree)
 
-		t.Print_tree_rx("\t" + prefix)
+		t.Print_tree_rx(prefix + "  " + prefix)
 	}
 }
 
-func Gen_tree(prxlist, nrxlist, erxlist *list.List) (*Seltree) {
+func Gen_tree(srxlist, nrxlist, erxlist *list.List) (*Seltree) {
 
 	var tree = New_seltree_node(nil, "/", false, nil)
 
-	tree.gen_seltree(prxlist,'s')
+	tree.gen_seltree(srxlist,'s')
 	tree.gen_seltree(nrxlist,'n')
-	tree.gen_seltree(erxlist,'e')
+	//tree.gen_seltree(erxlist,'e')
 
-	tree.Print_tree_rx("\t|--")
+	//tree.Print_tree_rx("\t|--")
 
-	return tree;
+	return tree
 }
 
 

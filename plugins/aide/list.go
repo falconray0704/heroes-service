@@ -22,20 +22,19 @@ func list_sorted_insert(listp *list.List, data interface{}, compare CompareType)
 		return listp, nil
 	}
 
-
 	if listp.Len() == 0 {
 		listp.PushFront(data)
 		return listp, nil
 	}
 
 	var curItem = listp.Front()
-	newItem := new(list.Element)
-	newItem.Value = data
-	for ; compare(newItem, curItem) > 0 && curItem.Next() != nil; {
+	//newItem := new(list.Element)
+	//newItem.Value = data
+	for ; compare(data, curItem.Value) > 0 && curItem.Next() != nil; {
 		curItem = curItem.Next()
 	}
 
-	if curItem.Next() == nil && compare(newItem, curItem) > 0 {
+	if curItem.Next() == nil && compare(data, curItem.Value) > 0 {
 		listp.PushBack(data)
 	} else {
 		listp.InsertBefore(data, curItem)
