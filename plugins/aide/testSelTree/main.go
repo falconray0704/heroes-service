@@ -1,39 +1,26 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/chainHero/heroes-service/plugins/aide"
 )
 
 const (
 	//jdbPath = "/usr/local/etc/aideDB/aide.db.new.json"
-	jdbPath = "./aide.db.new.json"
+	jdbOldPath = "./testData/aide.db.old.json"
+	jdbDiskPath = "./testData/aide.db.new.json"
 )
+
 
 func main() {
 
-	var err error
-	var jdb *aide.JsonDB = nil
-	jdb, err = aide.NewJDB(jdbPath)
+	var dbCfg = aide.New_DB_confg(jdbOldPath, "", jdbDiskPath)
 
-	if err != nil {
-		fmt.Printf("--- New jdb err:%s \n", err)
-	} else {
-		//var newStr []byte
-		//fmt.Printf("+++ Jdb: %+v \n", jdb.Jdb)
+	dbCfg.Load_JSON_DB(aide.DB_OLD)
+	//dbCfg.Load_JSON_DB(aide.DB_DISK)
 
-		//newStr, err = json.Marshal(&jdb.Jdb)
-		//newStr, err = json.MarshalIndent(&jdb.Jdb,"", "    ")
-		//fmt.Printf("+++ newStr:\n%s \n", newStr)
+	slist, nlist, elist := dbCfg.JdbOld.GetRxList()
 
-		fmt.Printf("+++ New jdb from: %s success.\n", jdb.FilePath)
-	}
-
-	slist, nlist, elist := jdb.GetRxList()
-
-	seltree := aide.Gen_tree(slist, nlist, elist)
-
-	seltree.Print_tree_rx(" |")
+	dbCfg.Tree = aide.Gen_tree(slist, nlist, elist)
+	dbCfg.Tree.Print_tree_rx(" |")
 
 }

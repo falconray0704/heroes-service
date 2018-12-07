@@ -4,6 +4,54 @@ import (
   "container/list"
 )
 
+type mode_t uint64
+type DB_ATTR_TYPE uint64
+
+type DBTree_Line struct {
+	/*
+		md5			[]byte
+		sha1		[]byte
+		rmd160		[]byte
+		tiger		[]byte
+
+		sha256		[]byte
+	*/
+	Sha512 string	`json:"sha512"`
+
+	/*
+		crc32		[]byte // MHASH only
+		haval		[]byte
+		gost		[]byte
+		crc32b		[]byte
+		whirlpool	[]byte
+	*/
+
+	Perm   mode_t	`json:"perm"`
+	Perm_o mode_t //Permission for tree traverse
+
+	Uid uint64		`json:"uid"`
+	Gid uint64		`json:"gid"`
+
+	//Atime	string
+	Ctime string	`json:"ctime"`
+	Mtime string	`json:"mtime"`
+
+	Inode uint64	`json:"inode"`
+	Nlink uint64	`json:"lcount"`
+
+	Size   uint64	`json:"size"`
+	Size_o uint64
+	Bcount uint64
+
+	Filename string	`json:"name"`
+	Fullpath string
+	Linkname string	`json:"lname"`
+
+	Cntx string
+
+	Attr DB_ATTR_TYPE		`json:"attr"`
+}
+
 /* seltree structure
  * lists have regex_t* in them
  * checked is whether or not the node has been checked yet and status
@@ -31,12 +79,19 @@ type Seltree struct {
 	Conf_lineno int64
 	Rx string
 
-	Attr uint64
+	Attr DB_ATTR_TYPE
 
-	New_data *DB_Line
-	Old_data *DB_Line
+	New_data *DBTree_Line
+	Old_data *DBTree_Line
 
-	Changed_attrs uint64
+	Changed_attrs DB_ATTR_TYPE
 
 }
+
+
+
+
+
+
+
 
