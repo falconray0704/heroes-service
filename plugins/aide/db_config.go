@@ -179,6 +179,11 @@ type DB_Line struct {
 	Cntx string
 
 	Attr string		`json:"attrStr"`
+
+	///// node attrs
+	Attr_node string		`json:"attrStr_node"`
+	Changed_attrs_node string		`json:"changed_attrs_node"`
+	Checked_node string			`json:"checked_node"`
 }
 
 type JsonSrc_Spec struct {
@@ -221,6 +226,20 @@ type DB_config struct {
 	JdbNew *JsonDB
 	JdbDisk *JsonDB
 
+	Ignored_added_attrs DB_ATTR_TYPE
+	Ignored_removed_attrs DB_ATTR_TYPE
+	Ignored_changed_attrs DB_ATTR_TYPE
+	Forced_attrs DB_ATTR_TYPE
+
+	Ntotal, Nadd, Nrem, Nchg int64
+	Report_base16 int64
+	Report_quiet int64
+	Report_detailed_init int
+	Grouped int
+	Summarize_changes int
+
+	Verbose_level int
+
 	Tree *Seltree
 
 }
@@ -239,6 +258,13 @@ func New_DB_confg(oldJsPath, newJsPath, diskJsPath string) (*DB_config) {
 	dbc.JdbDisk = nil
 
 	dbc.Tree = nil
+
+	/*
+	dbc.Action |= DO_COMPARE
+	dbc.Grouped = 1
+	dbc.Summarize_changes = 1
+	dbc.Verbose_level = 5
+	*/
 
 	return dbc
 }
@@ -294,7 +320,14 @@ func (dbLine *DB_Line) ToDBTreeLine() (*DBTree_Line) {
 	var treeLine = new(DBTree_Line)
 
 	var tmp uint64 = 0
-	tmp, _ = strconv.ParseUint(dbLine.Attr, 8, 64)
+	//var itmp int64 = 0
+	tmp, _ = strconv.ParseUint(dbLine.Attr, 10, 64)
+	/*
+	itmp, _ = strconv.ParseInt(dbLine.Attr, 10, 64)
+	if dbLine.Filename == "/folder_b/folder_ba" {
+		fmt.Printf("DB_DISK filename:%s tmp:0x%x itmp:0x%x tmpd:%d itmpd:%d \n", dbLine.Filename, tmp, itmp, tmp, itmp)
+	}
+	*/
 	treeLine.Attr = DB_ATTR_TYPE(tmp)
 	treeLine.Inode, _ = strconv.ParseUint(dbLine.Inode, 10, 64)
 	treeLine.Nlink, _ = strconv.ParseUint(dbLine.Nlink, 10, 64)
@@ -315,6 +348,15 @@ func (dbLine *DB_Line) ToDBTreeLine() (*DBTree_Line) {
 	treeLine.Mtime = dbLine.Mtime
 	treeLine.Cntx = dbLine.Cntx
 	treeLine.Sha512 = dbLine.Sha512
+
+	// node attrs
+	tmp, _ = strconv.ParseUint(dbLine.Attr_node, 10, 64)
+	treeLine.Attr_node = DB_ATTR_TYPE(tmp)
+	tmp, _ = strconv.ParseUint(dbLine.Changed_attrs_node, 10, 64)
+	treeLine.Changed_attrs_node = DB_ATTR_TYPE(tmp)
+	tmp, _ = strconv.ParseUint(dbLine.Checked_node, 10, 64)
+	treeLine.Checked_node = tmp
+
 
 	return treeLine
 }

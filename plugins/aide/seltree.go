@@ -50,6 +50,11 @@ type DBTree_Line struct {
 	Cntx string
 
 	Attr DB_ATTR_TYPE		`json:"attr"`
+
+	///// node attrs
+	Attr_node DB_ATTR_TYPE		`json:"attr_node"`
+	Changed_attrs_node DB_ATTR_TYPE		`json:"changed_attrs_node"`
+	Checked_node uint64			`json:"checked_node"`
 }
 
 /* seltree structure

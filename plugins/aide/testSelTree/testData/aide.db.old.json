@@ -8,9 +8,9 @@
 			"uid":	0,
 			"gid":	0,
 			"sizeStr":	"4096",
-			"mtime":	"2018-12-13 14:40:44 +0800",
-			"ctime":	"2018-12-13 14:40:44 +0800",
-			"lcountStr":	"29",
+			"mtime":	"2018-12-11 15:59:50 +0800",
+			"ctime":	"2018-12-11 15:59:50 +0800",
+			"lcountStr":	"28",
 			"sha512":	"0",
 			"attrStr_node":	"0",
 			"changed_attrs_node":	"0",
@@ -23,11 +23,11 @@
 			"inodeStr":	"14",
 			"uid":	1000,
 			"gid":	1000,
-			"sizeStr":	"232",
-			"mtime":	"2018-12-13 09:14:34 +0800",
-			"ctime":	"2018-12-13 09:14:34 +0800",
+			"sizeStr":	"174",
+			"mtime":	"2018-12-12 14:01:38 +0800",
+			"ctime":	"2018-12-12 14:01:38 +0800",
 			"lcountStr":	"1",
-			"sha512":	"f9hfWrphjId/SBow+4y31NZUzD+Z114bJX2tKAAbpmSj745SUrqX8IQSaNHIDLUQqnfvI4J9oy6LkyknSlqqkw==",
+			"sha512":	"LMMlqDPBrprOdmzpEaPSFHumt/k8Nf6y8tZXSVqE8i3Eona361cYZSe+fr3svHVwHWti7P1m7KSBV2igO3N7GQ==",
 			"attrStr_node":	"0",
 			"changed_attrs_node":	"0",
 			"checked_node":	"1540"
@@ -40,26 +40,10 @@
 			"uid":	1000,
 			"gid":	1000,
 			"sizeStr":	"4096",
-			"mtime":	"2018-12-13 10:47:02 +0800",
-			"ctime":	"2018-12-13 10:47:02 +0800",
+			"mtime":	"2018-11-16 20:14:22 +0800",
+			"ctime":	"2018-11-16 20:14:22 +0800",
 			"lcountStr":	"4",
 			"sha512":	"0",
-			"attrStr_node":	"0",
-			"changed_attrs_node":	"0",
-			"checked_node":	"1540"
-		}, {
-			"name":	"/folder_b/file_ba",
-			"lname":	"0",
-			"attrStr":	"36507225021",
-			"permStr":	"100664",
-			"inodeStr":	"3801091",
-			"uid":	1000,
-			"gid":	1000,
-			"sizeStr":	"29",
-			"mtime":	"2018-12-13 10:47:02 +0800",
-			"ctime":	"2018-12-13 10:47:02 +0800",
-			"lcountStr":	"1",
-			"sha512":	"YcuaIcAaOodWjfR/DgZZfPbZGfwftGeWFLAUcTYIXcvH6wNZf8P//LQeCfUW04DoHJy8RPudyTeRBM72CZuDjg==",
 			"attrStr_node":	"0",
 			"changed_attrs_node":	"0",
 			"checked_node":	"1540"
@@ -72,10 +56,26 @@
 			"uid":	1000,
 			"gid":	1000,
 			"sizeStr":	"4096",
-			"mtime":	"2018-12-13 14:34:51 +0800",
-			"ctime":	"2018-12-13 14:34:51 +0800",
+			"mtime":	"2018-11-16 17:46:20 +0800",
+			"ctime":	"2018-11-16 17:46:20 +0800",
 			"lcountStr":	"2",
 			"sha512":	"0",
+			"attrStr_node":	"0",
+			"changed_attrs_node":	"0",
+			"checked_node":	"1540"
+		}, {
+			"name":	"/folder_b/folder_ba/file_baa",
+			"lname":	"0",
+			"attrStr":	"36507225021",
+			"permStr":	"100644",
+			"inodeStr":	"3801094",
+			"uid":	1000,
+			"gid":	1000,
+			"sizeStr":	"58",
+			"mtime":	"2018-11-16 19:17:37 +0800",
+			"ctime":	"2018-11-16 19:17:37 +0800",
+			"lcountStr":	"1",
+			"sha512":	"zjmeEPb45CuZcLazN+J15wmYYV7llqBx2blCgT+cs7aqYzc78dI1xrRJ/+pFjk2rcSsg63WF4RZmEKURwArcWA==",
 			"attrStr_node":	"0",
 			"changed_attrs_node":	"0",
 			"checked_node":	"1540"
@@ -127,22 +127,6 @@
 			"attrStr_node":	"0",
 			"changed_attrs_node":	"0",
 			"checked_node":	"1540"
-		}, {
-			"name":	"/folder_d",
-			"lname":	"0",
-			"attrStr":	"34359741373",
-			"permStr":	"40755",
-			"inodeStr":	"12713985",
-			"uid":	0,
-			"gid":	0,
-			"sizeStr":	"4096",
-			"mtime":	"2018-12-13 14:40:44 +0800",
-			"ctime":	"2018-12-13 14:40:44 +0800",
-			"lcountStr":	"2",
-			"sha512":	"0",
-			"attrStr_node":	"0",
-			"changed_attrs_node":	"0",
-			"checked_node":	"1540"
 		}],
 	"spec":	{
 		"itemsCount":	12,
@@ -151,153 +135,153 @@
 	"rxLists":	{
 		"sRx":	[{
 				"rx":	"/boot/grub/grubenv",
-				"cfgNo":	27,
+				"cfgNo":	26,
 				"attr":	34359738396,
 				"restriction":	0
 			}, {
 				"rx":	"/",
-				"cfgNo":	92,
+				"cfgNo":	91,
 				"attr":	36507225022,
 				"restriction":	0
 			}],
 		"nRx":	[{
 				"rx":	"/bin",
-				"cfgNo":	25,
+				"cfgNo":	24,
 				"attr":	0,
 				"restriction":	0
 			}, {
 				"rx":	"/boot",
-				"cfgNo":	28,
+				"cfgNo":	27,
 				"attr":	0,
 				"restriction":	0
 			}, {
 				"rx":	"/cdrom",
-				"cfgNo":	30,
+				"cfgNo":	29,
 				"attr":	0,
 				"restriction":	0
 			}, {
 				"rx":	"/dev",
-				"cfgNo":	31,
+				"cfgNo":	30,
 				"attr":	0,
 				"restriction":	0
 			}, {
 				"rx":	"/etc",
-				"cfgNo":	37,
+				"cfgNo":	36,
 				"attr":	0,
 				"restriction":	0
 			}, {
 				"rx":	"/home",
-				"cfgNo":	50,
+				"cfgNo":	49,
 				"attr":	0,
 				"restriction":	0
 			}, {
 				"rx":	"/initrd.img",
-				"cfgNo":	52,
+				"cfgNo":	51,
 				"attr":	0,
 				"restriction":	0
 			}, {
 				"rx":	"/lib",
-				"cfgNo":	53,
+				"cfgNo":	52,
 				"attr":	0,
 				"restriction":	0
 			}, {
 				"rx":	"/lib64",
-				"cfgNo":	54,
+				"cfgNo":	53,
 				"attr":	0,
 				"restriction":	0
 			}, {
 				"rx":	"/lost\\+found",
-				"cfgNo":	55,
+				"cfgNo":	54,
 				"attr":	0,
 				"restriction":	0
 			}, {
 				"rx":	"/media",
-				"cfgNo":	56,
+				"cfgNo":	55,
 				"attr":	0,
 				"restriction":	0
 			}, {
 				"rx":	"/mnt",
-				"cfgNo":	57,
+				"cfgNo":	56,
 				"attr":	0,
 				"restriction":	0
 			}, {
 				"rx":	"/opt",
-				"cfgNo":	58,
+				"cfgNo":	57,
 				"attr":	0,
 				"restriction":	0
 			}, {
 				"rx":	"/proc",
-				"cfgNo":	59,
+				"cfgNo":	58,
 				"attr":	0,
 				"restriction":	0
 			}, {
 				"rx":	"/run",
-				"cfgNo":	60,
+				"cfgNo":	59,
 				"attr":	0,
 				"restriction":	0
 			}, {
 				"rx":	"/root",
-				"cfgNo":	63,
+				"cfgNo":	62,
 				"attr":	0,
 				"restriction":	0
 			}, {
 				"rx":	"/sbin",
-				"cfgNo":	65,
+				"cfgNo":	64,
 				"attr":	0,
 				"restriction":	0
 			}, {
 				"rx":	"/srv",
-				"cfgNo":	66,
+				"cfgNo":	65,
 				"attr":	0,
 				"restriction":	0
 			}, {
 				"rx":	"/sys",
-				"cfgNo":	67,
+				"cfgNo":	66,
 				"attr":	0,
 				"restriction":	0
 			}, {
 				"rx":	"/tmp",
-				"cfgNo":	68,
+				"cfgNo":	67,
 				"attr":	0,
 				"restriction":	0
 			}, {
 				"rx":	"/testDatas",
-				"cfgNo":	69,
+				"cfgNo":	68,
 				"attr":	0,
 				"restriction":	0
 			}, {
 				"rx":	"/usr/local/etc/aideDB/aide.db",
-				"cfgNo":	71,
+				"cfgNo":	70,
 				"attr":	0,
 				"restriction":	0
 			}, {
 				"rx":	"/usr/local/etc/aideDB/aide.db.new",
-				"cfgNo":	72,
+				"cfgNo":	71,
 				"attr":	0,
 				"restriction":	0
 			}, {
 				"rx":	"/usr/local/etc/aideDB/aide.db.new.json",
-				"cfgNo":	73,
+				"cfgNo":	72,
 				"attr":	0,
 				"restriction":	0
 			}, {
 				"rx":	"/usr",
-				"cfgNo":	84,
+				"cfgNo":	83,
 				"attr":	0,
 				"restriction":	0
 			}, {
 				"rx":	"/var",
-				"cfgNo":	86,
+				"cfgNo":	85,
 				"attr":	0,
 				"restriction":	0
 			}, {
 				"rx":	"/vmlinuz",
-				"cfgNo":	87,
+				"cfgNo":	86,
 				"attr":	0,
 				"restriction":	0
 			}, {
 				"rx":	"/.fabric-ca",
-				"cfgNo":	89,
+				"cfgNo":	88,
 				"attr":	0,
 				"restriction":	0
 			}],

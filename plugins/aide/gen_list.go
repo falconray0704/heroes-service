@@ -39,20 +39,20 @@ const (
 	S_ISVTX   uint64 = 01000		/* save swapped text even after use */
 
 	/* POSIX masks for st_mode. */
-	S_IRWXU   uint64 = 00700		/* owner:  rwx------ */
-	S_IRUSR   uint64 = 00400		/* owner:  r-------- */
-	S_IWUSR   uint64 = 00200		/* owner:  -w------- */
-	S_IXUSR   uint64 = 00100		/* owner:  --x------ */
+	S_IRWXU   mode_t = 00700		/* owner:  rwx------ */
+	S_IRUSR   mode_t = 00400		/* owner:  r-------- */
+	S_IWUSR   mode_t = 00200		/* owner:  -w------- */
+	S_IXUSR   mode_t = 00100		/* owner:  --x------ */
 
-	S_IRWXG   uint64 = 00070		/* group:  ---rwx--- */
-	S_IRGRP   uint64 = 00040		/* group:  ---r----- */
-	S_IWGRP   uint64 = 00020		/* group:  ----w---- */
-	S_IXGRP   uint64 = 00010		/* group:  -----x--- */
+	S_IRWXG   mode_t = 00070		/* group:  ---rwx--- */
+	S_IRGRP   mode_t = 00040		/* group:  ---r----- */
+	S_IWGRP   mode_t = 00020		/* group:  ----w---- */
+	S_IXGRP   mode_t = 00010		/* group:  -----x--- */
 
-	S_IRWXO   uint64 = 00007		/* others: ------rwx */
-	S_IROTH   uint64 = 00004		/* others: ------r-- */
-	S_IWOTH   uint64 = 00002		/* others: -------w- */
-	S_IXOTH   uint64 = 00001		/* others: --------x */
+	S_IRWXO   mode_t = 00007		/* others: ------rwx */
+	S_IROTH   mode_t = 00004		/* others: ------r-- */
+	S_IWOTH   mode_t = 00002		/* others: -------w- */
+	S_IXOTH   mode_t = 00001		/* others: --------x */
 
 )
 
@@ -71,6 +71,10 @@ func S_ISCHR(mode mode_t) bool {
 
 func S_ISBLK(mode mode_t) bool {
 	return ((mode) & S_IFMT) == S_IFBLK /* is a block spec */
+}
+
+func S_ISLNK(mode mode_t) bool {
+	return ((mode) & S_IFMT) == S_IFLNK /* is a block spec */
 }
 
 func S_ISFIFO(mode mode_t) bool {
@@ -273,12 +277,17 @@ func Compare_node_by_path(n1 interface{}, n2 interface{}) (int) {
 	return strings.Compare(t1.Path, t2.Path)
 }
 
-func strlastslash(str string) ([]byte) {
+func strlastslash(str string) string {
 
-	sPath := []byte(str)
+	sPath := []byte(str + "\x00")
 	ldx := bytes.LastIndex(sPath, []byte("/"))
 
-	return sPath[:ldx]
+	//sPath[ldx + 1] = '\x00'
+	if ldx == 0 {
+		return string(sPath[:1])
+	} else {
+		return string(sPath[:ldx])
+	}
 }
 
 func strrxtok(rx string) (string) {
@@ -317,7 +326,7 @@ func strrxtok(rx string) (string) {
 	return ret
 }
 
-func strgetndirname(path string, depth int) ([]byte) {
+func strgetndirname(path string, depth int) string {
 
 	var i = 0
 	var idx = 0
@@ -341,10 +350,11 @@ func strgetndirname(path string, depth int) ([]byte) {
 
 	/* If we ran out string return the whole string */
 	if sPath[idx] == '\x00' {
-		return []byte(path)
+		//return []byte(path)
+		return path
 	}
 
-	return sPath[:idx]
+	return string(sPath[:idx])
 }
 
 func treedepth(node *Seltree) (int) {
@@ -373,11 +383,33 @@ func (node *Seltree) Copy_rule_ref(r *Rx_rule) {
 	*/
 }
 
+func isPathContain(containerPath, subPath string) bool {
+	var lenC = len(containerPath)
+	var lenS = len(subPath)
+
+	if lenC < lenS {
+		return false
+	} else if lenC == lenS {
+		if containerPath == subPath {
+			return true
+		} else {
+			return false
+		}
+	} else {
+		sContainerPath := []byte(containerPath)
+		ls := bytes.LastIndexByte(sContainerPath, '/')
+
+		sSubPath := []byte(subPath)
+
+		return bytes.Equal(sContainerPath[:ls], sSubPath)
+	}
+}
+
 /* This function returns a node with the same inode value as the 'file' */
 /* The only place it is used is in add_file_to_tree() function */
 func (tree *Seltree) get_seltree_inode(file *DBTree_Line, db uint64) (*Seltree) {
 	var node *Seltree = nil
-	var tmp []byte = nil
+	//var tmp []byte = nil
 	var r *list.Element = nil
 
 	if tree == nil {
@@ -391,14 +423,14 @@ func (tree *Seltree) get_seltree_inode(file *DBTree_Line, db uint64) (*Seltree) 
 	}
 
 	/* tmp is the directory of the file->filename */
-	tmp = strgetndirname(file.Filename,treedepth(tree)+1)
+	//tmp = strgetndirname(file.Filename,treedepth(tree)+1)
+	treeDepth := treedepth(tree)
+	pathDir := strgetndirname(file.Filename,  treeDepth + 1)
 	for r = tree.Childs.Front(); r != nil; r = r.Next() {
 		/* We are interested only in files with the same regexp specification */
 		t, _ := r.Value.(*Seltree)
-		sPath := []byte(t.Path + "\x00")
-		tmp = append(tmp, '\x00')
 
-		if (len(tmp) == len(file.Filename)) || (bytes.Compare(sPath, tmp) == 0) {
+		if (len(pathDir) == len(file.Filename)) || isPathContain(t.Path, pathDir) {
 			node = tree.get_seltree_inode(file, db)
 			if node != nil {
 				break
@@ -415,27 +447,22 @@ func (tree *Seltree) get_seltree_node(path string) (node *Seltree) {
 	//var r *list.List = nil
 	var r *list.Element = nil
 
-	var tmp []byte = nil
+	//var tmp []byte = nil
 
 	if tree == nil {
 		return nil
 	}
 
-	sPath := []byte(path + "\x00")
-	sTreePath := []byte(tree.Path + "\x00")
-
-	if bytes.Equal(sTreePath, sPath) {
+	if isPathContain(tree.Path, path) {
 		return tree
 	} else {
-		tmp = strgetndirname(path, treedepth(tree) + 1)
+		treeDepth := treedepth(tree)
+		pathDir := strgetndirname(path,  treeDepth + 1)
 		for r = tree.Childs.Front(); r != nil ; r = r.Next() {
 			t, _ := r.Value.(*Seltree)
-			sT := []byte(t.Path + "\x00")
-			sTmp := []byte(string(tmp) + "\x00")
-			//if(strncmp(((seltree*)r->data)->path,tmp,strlen(tmp)+1)==0) {
-			if bytes.Equal(sT, sTmp) {
+			if isPathContain(t.Path, pathDir) {
 				node = t.get_seltree_node(path)
-				if(node != nil) {
+				if node != nil {
 					return node
 				}
 			}
@@ -550,7 +577,7 @@ func New_seltree_node(tree *Seltree, path string, isrx bool, r *Rx_rule) (*Seltr
 			parent = tree.get_seltree_node(tmprxtok)
 		} else {
 			dirn := strlastslash(path)
-			parent = tree.get_seltree_node(string(dirn))
+			parent = tree.get_seltree_node(dirn)
 		}
 
 		if parent == nil {
@@ -558,7 +585,7 @@ func New_seltree_node(tree *Seltree, path string, isrx bool, r *Rx_rule) (*Seltr
 				parent = New_seltree_node(tree, tmprxtok, isrx, r)
 			} else {
 				dirn := strlastslash(path)
-				parent = New_seltree_node(tree, string(dirn),isrx,r)
+				parent = New_seltree_node(tree, dirn,isrx,r)
 			}
 		}
 
@@ -678,7 +705,7 @@ func Check_list_for_match( rxrlist *list.List, text string, attr *DB_ATTR_TYPE, 
 
 		rxc, isOk = r.Value.(*Rx_rule)
 		if !isOk {
-			fmt.Printf("--- Check_list_for_match() %s got incorrect rxc Type.\n", text)
+			//fmt.Printf("--- Check_list_for_match() %s got incorrect rxc Type.\n", text)
 			continue
 		}
 
@@ -687,22 +714,22 @@ func Check_list_for_match( rxrlist *list.List, text string, attr *DB_ATTR_TYPE, 
 
 		if retLen > 0 {
 			if rxc.Crx.MatchString(text) { // full match
-				fmt.Printf("--- %s matches rule:%s from line:%d: \n",text, rxc.Rx, rxc.Conf_lineno)
-				if rxc.Restriction != 0 || (file_type & rxc.Restriction) != 0 {
-				*attr = rxc.Attr
-				fmt.Printf("--- %s matches restriction (%d) for rule:%s from line:%d: \n",text, rxc.Restriction, rxc.Rx, rxc.Conf_lineno)
+				//fmt.Printf("--- %s matches rule:%s from line:%d: \n",text, rxc.Rx, rxc.Conf_lineno)
+				if rxc.Restriction == 0 || (file_type & rxc.Restriction) != 0 {
+					*attr = rxc.Attr
+					//fmt.Printf("--- %s matches restriction (%d) for rule:%s from line:%d: \n",text, rxc.Restriction, rxc.Rx, rxc.Conf_lineno)
 					return 0
 				} else {
-					fmt.Printf("--- %s doesn't match restriction (%d) for rule:%s from line:%d: \n",text, rxc.Restriction, rxc.Rx, rxc.Conf_lineno)
+					//fmt.Printf("--- %s doesn't match restriction (%d) for rule:%s from line:%d: \n",text, rxc.Restriction, rxc.Rx, rxc.Conf_lineno)
 					retval = -1
 				}
 
 			} else { //PCRE_ERROR_PARTIAL
-				fmt.Printf("--- %s PARTIAL match rule:%s from line:%d: \n",text, rxc.Rx, rxc.Conf_lineno)
+				//fmt.Printf("--- %s PARTIAL match rule:%s from line:%d: \n",text, rxc.Rx, rxc.Conf_lineno)
 				retval = -1
 			}
 		} else {
-			fmt.Printf("--- %s doesn't match rule:%s from line:%d: \n",text, rxc.Rx, rxc.Conf_lineno)
+			//fmt.Printf("--- %s doesn't match rule:%s from line:%d: \n",text, rxc.Rx, rxc.Conf_lineno)
 		}
 	}
 	return retval
@@ -734,13 +761,26 @@ func Check_node_for_match( node *Seltree, text string, perm mode_t, retval int, 
 
 	file_type = get_file_type(perm)
 
+	/*
+	if text == "/file_a" {
+		fmt.Printf("+++ Check_node_for_match() text:%s perm:%x attr:0x%x retval:0x%x\n", text, perm, *attr, retval)
+	}
+	*/
+
 	/* if this call is not recursive we check the equals list and we set top *
 	* and retval so we know following calls are recursive */
 	if ( retval & 16 ) == 0 {
 		top = 1
 		retval |= 16
 
-		switch Check_list_for_match(node.Equ_rx_lst, text, attr, file_type) {
+		cm := Check_list_for_match(node.Equ_rx_lst, text, attr, file_type)
+		/*
+		if text == "/file_a" {
+			fmt.Printf("+++ Check_node_for_match() text:%s perm:%x attr:0x%x retval:0x%x cm:%d \n", text, perm, *attr, retval, cm)
+		}
+		*/
+
+		switch cm {
 		case 0:
 			{
 				//error(220, "check_node_for_match: equal match for '%s'\n", text);
@@ -759,13 +799,26 @@ func Check_node_for_match( node *Seltree, text string, perm mode_t, retval int, 
 			}
 		}
 	}
+
+	/*
+	if text == "/file_a" {
+		fmt.Printf("+++ Check_node_for_match() text:%s perm:%x attr:0x%x retval:0x%x\n", text, perm, *attr, retval)
+	}
+	*/
+
 	/* We'll use retval to pass information on whether to recurse
 	* the dir or not */
 
 
 	/* If 4 and 8 are not set, we will check for matches */
 	if (retval & (4|8)) == 0 {
-		switch Check_list_for_match(node.Sel_rx_lst, text, attr, file_type) {
+		cm := Check_list_for_match(node.Sel_rx_lst, text, attr, file_type)
+		/*
+		if text == "/file_a" {
+			fmt.Printf("+++ Check_node_for_match() text:%s perm:%x attr:0x%x retval:0x%x cm:%d \n", text, perm, *attr, retval, cm)
+		}
+		*/
+		switch cm {
 		case 0:
 			{
 				//error(220, "check_node_for_match: selective match for '%s'\n", text);
@@ -785,9 +838,19 @@ func Check_node_for_match( node *Seltree, text string, perm mode_t, retval int, 
 		}
 	}
 
+	/*
+	if text == "/file_a" {
+		fmt.Printf("+++ Check_node_for_match() text:%s perm:%x attr:0x%x retval:0x%x\n", text, perm, *attr, retval)
+	}
+	*/
 	/* Now let's check the ancestors */
 	retval = Check_node_for_match(node.Parent,text, perm, retval,attr)
 
+	/*
+	if text == "/file_a" {
+		fmt.Printf("+++ Check_node_for_match() text:%s perm:%x attr:0x%x retval:0x%x\n", text, perm, *attr, retval)
+	}
+	*/
 
 	/* Negative regexps are the strongest so they are checked last */
 	/* If this file is to be added */
@@ -798,6 +861,12 @@ func Check_node_for_match( node *Seltree, text string, perm mode_t, retval int, 
 			retval = 0
 		}
 	}
+
+	/*
+	if text == "/file_a" {
+		fmt.Printf("+++ Check_node_for_match() text:%s perm:%x attr:0x%x retval:0x%x\n", text, perm, *attr, retval)
+	}
+	*/
 	/* Now we discard the info whether a match was made or not *
 	* and just return 0,1 or 2 */
 	if top != 0 {
@@ -811,19 +880,21 @@ func (tree *Seltree) Check_rxtree(filename string, attr *DB_ATTR_TYPE, perm mode
 	var idx = 0
 	var retval = 0
 	var pnode *Seltree = nil
-	var parentname []byte = nil
-
-	parentname = []byte(filename)
+	var parentname = []byte(filename)
+	var strParentname string
 
 	idx = bytes.LastIndexByte(parentname, '/')
 
 	if idx != 0 {
-		parentname[idx] = '\x00'
+		strParentname = string(parentname[:idx])
 	} else {
+		/*
 		if parentname[1] != '\x00' {
-			/* we are in the root dir */
+			// we are in the root dir
 			parentname[1] = '\x00'
 		}
+		*/
+		strParentname = "/"
 	}
 
 	/*
@@ -852,7 +923,10 @@ func (tree *Seltree) Check_rxtree(filename string, attr *DB_ATTR_TYPE, perm mode
 	}
 	*/
 
-	pnode = tree.get_seltree_node(string(parentname))
+	if filename == "/folder_b/file_ba" {
+		fmt.Printf("+++ Check_rxtree() filename:%s \n", filename)
+	}
+	pnode = tree.get_seltree_node(strParentname)
 
 	*attr = 0
 	retval = Check_node_for_match(pnode,filename, perm, 0,attr)
@@ -989,7 +1063,7 @@ func (tree *Seltree) add_file_to_tree(file *DBTree_Line, db uint64, attr DB_ATTR
 
 	node = tree.get_seltree_node(file.Filename)
 
-	if node != nil {
+	if node == nil {
 		node = New_seltree_node(tree,file.Filename,false, nil)
 	}
 
@@ -1132,7 +1206,7 @@ func (tree *Seltree) add_file_to_tree(file *DBTree_Line, db uint64, attr DB_ATTR
 	}
 }
 
-func (tree * Seltree) populate_tree(conf *DB_config) {
+func (tree * Seltree) Populate_tree(conf *DB_config) {
 
 	var initdbwarningprinted = false
 	var node *Seltree = nil
@@ -1156,6 +1230,11 @@ func (tree * Seltree) populate_tree(conf *DB_config) {
 			/* This is needed because check_rxtree assumes there is a parent
 			for the node for old->filename */
 			newTreeLine = db_line.ToDBTreeLine()
+
+			if db_line.Filename == "/folder_b/file_ba" {
+				fmt.Printf("+++ Populate_tree() DB_NEW new.Filename:%s \n", newTreeLine.Filename)
+			}
+
 			node = tree.get_seltree_node(newTreeLine.Filename)
 
 			if node == nil {
@@ -1168,13 +1247,28 @@ func (tree * Seltree) populate_tree(conf *DB_config) {
 			}
 		}
 	}
+	tree.PrintTreeInfo(1, 0)
 
 	if((conf.Action & DO_INIT) != 0) || ((conf.Action & DO_COMPARE) != 0) {
 		/* FIXME  */
 		newTreeLine = nil
 		for _, db_line := range conf.JdbDisk.Jdb.FilesDB {
 			newTreeLine = db_line.ToDBTreeLine()
-			tree.add_file_to_tree(newTreeLine, DB_DISK, attr, conf)
+
+			if db_line.Filename == "/folder_b/folder_ba" {
+				fmt.Printf("DB_DISK filename:%s attr:0x%x\n", newTreeLine.Filename, newTreeLine.Attr)
+			}
+
+			tree.add_file_to_tree(newTreeLine, DB_NEW, attr, conf)
+
+			{
+				node = tree.get_seltree_node("/folder_b/folder_ba")
+				if node == nil {
+					fmt.Printf("-------------- get folder_ba fail\n")
+				} else {
+					fmt.Printf("DB_DISK new:%s tree %s checked:0x%x\n", newTreeLine.Filename, node.Path, node.Checked)
+				}
+			}
 		}
 	}
 
